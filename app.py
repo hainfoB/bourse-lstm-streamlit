@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Dropout, Bidirectional
 from keras.callbacks import EarlyStopping
-from keras.optimizers.legacy import Adam  # Updated import for legacy Adam optimizer
+from tensorflow.keras.optimizers.legacy import Adam
 from kerastuner.tuners import RandomSearch
 from kerastuner.engine.hyperparameters import HyperParameters
 import keras.backend as K
