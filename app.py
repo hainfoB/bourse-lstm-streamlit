@@ -10,10 +10,9 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Dropout, Bidirectional
 from keras.callbacks import EarlyStopping
-from tensorflow.keras.optimizers.legacy import Adam
-from kerastuner.tuners import RandomSearch
-from kerastuner.engine.hyperparameters import HyperParameters
-import keras.backend as K
+from tensorflow.keras.optimizers.legacy import Adam  # ✅ CORRECT
+from keras_tuner.tuners import RandomSearch  # ✅ CORRECT
+from keras_tuner.engine.hyperparameters import HyperParameters  # ✅ CORRECTimport keras.backend as K
 import datetime
 
 # --- Configuration de la page ---
