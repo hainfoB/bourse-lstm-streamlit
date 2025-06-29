@@ -17,7 +17,7 @@ import datetime
 
 # --- Configuration de la page ---
 st.set_page_config(page_title="Analyse et Prédiction Boursière par M.Haithem BERKANE AVRIL 2025", layout="wide")
-st.title("Analyse et Prédiction Boursière par M.Haithem BERKANE AVRIL 2025")
+st.title("Analyse et Prédiction Boursière par M.Haithem BERKANE Juillet 2025")
 
 # Stockage du DataFrame dans st.session_state
 if "df" not in st.session_state:
