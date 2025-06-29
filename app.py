@@ -14,6 +14,7 @@ from tensorflow.keras.optimizers.legacy import Adam  # ✅ CORRECT
 from keras_tuner.tuners import RandomSearch  # ✅ CORRECT
 from keras_tuner.engine.hyperparameters import HyperParameters  # ✅ CORRECTimport keras.backend as K
 import datetime
+import keras.backend as K
 
 # --- Configuration de la page ---
 st.set_page_config(page_title="Analyse et Prédiction Boursière par M.Haithem BERKANE AVRIL 2025", layout="wide")
@@ -22,15 +23,12 @@ st.title("Analyse et Prédiction Boursière par M.Haithem BERKANE Juillet 2025")
 # Stockage du DataFrame dans st.session_state
 if "df" not in st.session_state:
     st.session_state.df = None
-
 # --- Fonction de métrique personnalisée ---
 def custom_accuracy(y_true, y_pred):
-    # Considère comme correct si l'erreur absolue est <= 10% de la valeur réelle
     diff = K.abs(y_true - y_pred)
     tol = 0.1 * K.abs(y_true)
     correct = K.cast(K.less_equal(diff, tol), K.floatx())
     return K.mean(correct)
-
 # --- Fonctions de chargement et prétraitement ---
 @st.cache_data
 def load_yfinance_data(ticker, period="5y"):
