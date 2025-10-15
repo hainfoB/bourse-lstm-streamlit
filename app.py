@@ -20,45 +20,59 @@ import datetime
 # Catégories multi-secteurs avec EMOJIS
 # ==============================
 CATEGORIES = {
-    "⛏️ Matières premières": {
-        "🥇 Or": "GC=F",
-        "🥈 Argent": "SI=F",
-        "💎 Platine": "PL=F",
-        "💍 Palladium": "PA=F",
-        "☕ Café": "KC=F",
-        "🌾 Blé": "ZW=F",
-        "🍬 Sucre": "SB=F",
+    "🌐 Indices Mondiaux (ETFs)": {
+        "S&P 500": "SPY", "NASDAQ 100": "QQQ", "Dow Jones": "DIA", "MSCI World": "URTH",
+        "CAC 40 (France)": "EWQ", "FTSE 100 (UK)": "EWU", "DAX (Allemagne)": "EWG", "Nikkei 225 (Japon)": "EWJ",
     },
-    "💊 Santé (indices pharma)": {
-        "💉 Pfizer": "PFE",
-        "🩹 Johnson & Johnson": "JNJ",
-        "🧬 Moderna": "MRNA",
+    "🇺🇸 Actions (US)": {
+        "🍎 Apple": "AAPL", "💻 Microsoft": "MSFT", "🚗 Tesla": "TSLA", "📦 Amazon": "AMZN",
+        "Alphabet (Google)": "GOOGL", "NVIDIA": "NVDA",
+    },
+    "🇨🇦 Actions (Canada)": {
+        "🏦 Royal Bank": "RY.TO", "🛍️ Shopify": "SHOP.TO", "🛢️ Enbridge": "ENB.TO",
+    },
+    "🇫🇷 Actions (France)": {
+        "👜 LVMH": "MC.PA", "💅 L'Oréal": "OR.PA", "⛽ TotalEnergies": "TTE.PA",
+    },
+    "🇬🇧 Actions (Royaume-Uni)": {
+        "🛢️ Shell": "SHEL.L", "💊 AstraZeneca": "AZN.L", "🏦 HSBC": "HSBA.L",
+    },
+    "🇩🇪 Actions (Allemagne)": {
+        "💻 SAP": "SAP.DE", "🔩 Siemens": "SIE.DE", "🚗 Volkswagen": "VOW3.DE",
+    },
+    "🇨🇭 Actions (Suisse)": {
+        "🍫 Nestlé": "NESN.SW", "⚕️ Roche": "ROG.SW", " Novartis": "NOVN.SW",
+    },
+    "🇯🇵 Actions (Japon)": {
+        "🚗 Toyota": "7203.T", "🎮 Sony": "6758.T", "SoftBank": "9984.T",
+    },
+    "🇨🇳 Actions (Chine & HK)": {
+        "🍶 Kweichow Moutai": "600519.SS", "🛍️ Alibaba": "BABA", "🎮 Tencent": "0700.HK",
+    },
+    "🇮🇳 Actions (Inde)": {
+        "Reliance Industries": "RELIANCE.NS", "Tata (TCS)": "TCS.NS", "HDFC Bank": "HDFCBANK.NS",
+    },
+    "🇧🇷 Actions (Brésil)": {
+        "🛢️ Petrobras": "PBR", "Vale": "VALE", "🏦 Itaú Unibanco": "ITUB",
+    },
+    "🪙 Cryptomonnaies": {
+        "Bitcoin": "BTC-USD", "Ethereum": "ETH-USD", "Ripple": "XRP-USD", "Cardano": "ADA-USD",
+    },
+    "💱 Forex (Taux de Change)": {
+        "EUR/USD": "EURUSD=X", "USD/JPY": "JPY=X", "GBP/USD": "GBPUSD=X", "AUD/USD": "AUDUSD=X",
+    },
+    "⛏️ Énergies": {
+        "Pétrole Brut WTI": "CL=F", "Pétrole Brent": "BZ=F", "Gaz Naturel": "NG=F",
+    },
+    "💎 Métaux Précieux & Industriels": {
+        "🥇 Or": "GC=F", "🥈 Argent": "SI=F", "Cuivre": "HG=F", "💎 Platine": "PL=F", "💍 Palladium": "PA=F",
     },
     "🚜 Agriculture": {
-        "🌽 Maïs": "ZC=F",
-        "🌱 Soja": "ZS=F",
-        "🧶 Coton": "CT=F",
+        "🌽 Maïs": "ZC=F", "🌾 Blé": "ZW=F", "🌱 Soja": "ZS=F", "☕ Café": "KC=F", "🍬 Sucre": "SB=F", "🧶 Coton": "CT=F",
     },
-    "🌩️ Météo (proxy via indices énergie)": {
-        "🔥 Gaz Naturel (sensibilité météo)": "NG=F",
-        "⚡ Énergie Électrique (proxy)": "ELEC.CM",
-    },
-    "🚢 Supply Chain & Industrie": {
-        "🚛 Dow Jones Transport": "^DJT",
-        "✈️ FedEx": "FDX",
-        "컨 Maersk": "MAERSK-B.CO",
-    },
-    "💰 Actions": {
-        "🍎 Apple": "AAPL",
-        "💻 Microsoft": "MSFT",
-        "🚗 Tesla": "TSLA",
-        "📦 Amazon": "AMZN",
-    },
-    "🏛️ Économie & Société (FRED)": {
-        "📉 Taux de chômage (US)": "UNRATE",
-        "📈 PIB (US)": "GDP",
-        "💲 Inflation (US CPI)": "CPIAUCSL",
-        "🎓 Inscriptions universitaires (US, proxy)": "ENROLL",  # fictif
+    "🏛️ Économie (FRED - US)": {
+        "📉 Taux de chômage": "UNRATE", "📈 PIB (GDP)": "GDP", "💲 Inflation (CPI)": "CPIAUCSL",
+        "Taux d'intérêt 10 ans": "DGS10", "Masse Monétaire M2": "M2SL",
     }
 }
 
