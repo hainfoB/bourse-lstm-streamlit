@@ -794,6 +794,7 @@ if selected_page_key == 'home':
         st.session_state['trained_symbol'] = symbol
         st.session_state['trained_horizon'] = horizon_key
         st.session_state['trained_complexity'] = complexity_key
+        st.session_state['trained_X_train_len'] = len(X_train) # <-- CORRECTION : Sauvegarder la taille réelle
 
     is_model_stale = not ('model' in st.session_state and
                            st.session_state.get('trained_symbol') == symbol and
@@ -810,13 +811,17 @@ if selected_page_key == 'home':
         df_history_processed = st.session_state['df_processed']
         features_used = st.session_state['features_used']
         target_col = st.session_state['target_col']
-        prep_results_full = prepare_data(df_history_original, features_used)
-        if prep_results_full[0] is not None:
-            _, _, _, _, _, _, df_processed_full = prep_results_full
-            X_train_len = int(len(df_processed_full) * 0.8) - LOOK_BACK
+        
+        # --- CORRECTION : Récupérer la taille sauvegardée ---
+        if 'trained_X_train_len' in st.session_state:
+            X_train_len = st.session_state['trained_X_train_len']
         else:
-            st.error("Impossible de recalculer les données pour l'affichage.")
+            # Sécurité au cas où l'état serait corrompu (ex: ancien modèle sauvegardé)
+            st.warning("L'état de session est ancien. Veuillez ré-entraîner le modèle pour une évaluation précise.")
             st.stop()
+        
+        # --- SUPPRESSION BLOC REDONDANT ---
+        # Le bloc 'prep_results_full' a été supprimé car il était redondant et bogué.
 
         tab_perf, tab_eval, tab_proj = st.tabs([
             t('tab_perf'), 
@@ -870,10 +875,14 @@ if selected_page_key == 'home':
                 else:
                     preds_scaled = model.predict(X_test_eval)
                     preds_log_returns = price_scaler.inverse_transform(preds_scaled)
+                    
+                    # CORRECTION : test_start_index utilise X_train_len (qui est correct maintenant)
                     test_start_index = X_train_len + LOOK_BACK
+                    
                     if test_start_index < len(df_processed_eval) and (test_start_index - 1) < len(df_processed_eval):
                         y_test_true_prices = df_processed_eval[TARGET_COL_ORIG_NAME].iloc[test_start_index:].values
                         y_test_previous_prices = df_processed_eval[TARGET_COL_ORIG_NAME].iloc[test_start_index - 1 : -1].values
+                        
                         if len(y_test_previous_prices) == len(preds_log_returns):
                             preds_rescaled = y_test_previous_prices * np.exp(preds_log_returns.flatten())
                             y_test_rescaled = y_test_true_prices
@@ -964,4 +973,3 @@ elif selected_page_key == 'contact':
         st.markdown(f"**{t('contact_email')} :** Haithem-Berkane@outlook.fr")
         st.markdown(f"**{t('contact_phone')} :** +213 661 338 333")
         st.markdown(f"**{t('contact_address')} :** Algeria")
-
