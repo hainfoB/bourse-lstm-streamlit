@@ -5,6 +5,7 @@ import yfinance as yf
 import plotly.graph_objects as go
 import re
 import datetime
+import os
 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -16,21 +17,26 @@ import keras_tuner as kt
 
 import pandas_datareader.data as web
 
+try:
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    LOGO_PATH = os.path.join(SCRIPT_DIR, "logo.png")
+    if not os.path.exists(LOGO_PATH):
+        LOGO_PATH = "🚀"
+except NameError:
+    LOGO_PATH = "logo.png"
+
 # ==============================
 # CONFIGURATION
 # ==============================
 st.set_page_config(
     page_title="Haithem Vision Predict V3.0",
     layout="wide",
-    page_icon="logo.png",
+    page_icon=LOGO_PATH,
 )
 
 # ==============================
 # MULTILINGUE (i18n)
 # ==============================
-
-# Dictionnaire de toutes les traductions
-# (Inchangé)
 translations = {
     'fr': {
         'page_title': "🚀 Haithem Vision Predict V3.0",
@@ -337,17 +343,12 @@ translations = {
     }
 }
 
-# Initialiser l'état de la session pour la langue
 if 'lang' not in st.session_state:
-    st.session_state.lang = 'fr' # Langue par défaut
+    st.session_state.lang = 'fr'
 
-# Fonction d'aide pour la traduction
 def t(key):
-    # Gestion simple des erreurs au cas où une clé manquerait
     return translations.get(st.session_state.lang, translations['fr']).get(key, key)
 
-
-# Options de mappage (indépendantes de la langue)
 HORIZON_KEYS = ['6m', '1y', '3y', '5y']
 HORIZON_MAP = {
     '6m': {"train_years": 2, "predict_days": 180},
@@ -359,11 +360,6 @@ COMPLEXITY_KEYS = ['simple', 'complex']
 LOOK_BACK = 60
 TARGET_COL_ORIG_NAME = "Original_Price"
 
-
-# ==============================
-# CATÉGORIES
-# (Inchangé)
-# ==============================
 CATEGORIES = {
     "🌐 Indices Mondiaux (ETFs)": {
         "S&P 500": "SPY", "NASDAQ 100": "QQQ", "Dow Jones": "DIA", "MSCI World": "URTH",
@@ -421,13 +417,9 @@ CATEGORIES = {
     }
 }
 
-
 # ==============================
 # CSS STYLING
-# (Inchangé)
 # ==============================
-
-# --- INJECTION CSS POUR LE DESIGN ---
 CSS_STYLE = """
 <style>
 /* Arrière-plan principal de l'application */
@@ -438,12 +430,34 @@ CSS_STYLE = """
 [data-testid="stSidebar"] {
     background-color: #0A2342; /* Bleu Foncé */
 }
-/* Texte de la Sidebar */
-[data-testid="stSidebar"] .st-emotion-cache-16txtl3, 
-[data-testid="stSidebar"] .st-emotion-cache-183lzff,
-[data-testid="stSidebar"] .st-emotion-cache-1d8k8ss p {
+
+/* --- DÉBUT DE LA CORRECTION CSS --- */
+
+/* Cible tous les textes (paragraphes) DANS la sidebar */
+[data-testid="stSidebar"] p {
     color: #FDF8E3; /* Beige clair pour le texte */
 }
+
+/* Cible tous les labels de widgets (radio, selectbox, etc.) DANS la sidebar */
+[data-testid="stSidebar"] label {
+    color: #FDF8E3 !important; /* Beige clair, !important pour forcer */
+}
+
+/* Cible tous les en-têtes (h1, h2, h3) DANS la sidebar */
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #FDF8E3; /* Beige clair pour le texte */
+}
+
+/* Cible spécifiquement le texte à l'intérieur des selectbox (la valeur sélectionnée) */
+[data-testid="stSidebar"] [data-testid="stSelectbox"] [data-testid="stMarkdownContainer"] p {
+     color: #FDF8E3;
+}
+
+/* --- FIN DE LA CORRECTION CSS --- */
+
+
 /* Titre principal */
 h1 {
     color: #0A2342; /* Bleu Foncé */
@@ -506,58 +520,48 @@ h2, h3 {
 """
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 
-# CSS SPÉCIFIQUE POUR RTL (ARABE)
 RTL_CSS = """
 <style>
-/* Appliquer RTL à l'ensemble du corps et de la sidebar */
 body, .main, [data-testid="stSidebar"] {
     direction: rtl !important;
 }
-/* Aligner le texte des éléments de la sidebar à droite */
 [data-testid="stSidebar"] .st-emotion-cache-16txtl3, 
 [data-testid="stSidebar"] .st-emotion-cache-183lzff,
 [data-testid="stSidebar"] .st-emotion-cache-1d8k8ss p,
 [data-testid="stSidebar"] .st-emotion-cache-16idsys p {
     text-align: right !important;
 }
-/* Aligner les titres de la sidebar à droite */
 [data-testid="stSidebar"] h1, 
 [data-testid="stSidebar"] h2, 
 [data-testid="stSidebar"] h3 {
     text-align: right !important;
 }
-/* Aligner les titres principaux et paragraphes à droite */
 h1, h2, h3, p {
     text-align: right !important;
 }
-/* Aligner le texte des boîtes d'info et métriques */
 [data-testid="stInfo"], [data-testid="stMetric"], [data-testid="stSuccess"], [data-testid="stError"] {
     text-align: right !important;
     direction: rtl !important;
 }
-/* Inverser le padding du bouton pour l'icône */
 .stButton > button {
-    direction: ltr !important; /* Garder l'icône à gauche */
-    text-align: right !important; /* Aligner le texte à droite */
+    direction: ltr !important;
+    text-align: right !important;
     padding-left: 1rem !important;
     padding-right: 2.5rem !important;
 }
-/* Ajuster le sélecteur de langue pour RTL */
 [data-testid="stSidebar"] [data-testid="stRadio"] {
-    direction: ltr !important; /* Garder les boutons radio LTR */
+    direction: ltr !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] label {
-    margin-left: 0.5rem; /* Ajouter un peu d'espace */
+    margin-left: 0.5rem;
     margin-right: 0;
 }
-/* Aligner les onglets à droite */
 [data-testid="stTabs"] {
     width: 100%;
 }
 [data-testid="stTabs"] [role="tablist"] {
     justify-content: flex-end;
 }
-/* S'assurer que le contenu markdown est aligné à droite */
 [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {
      text-align: right !important;
      direction: rtl !important;
@@ -565,7 +569,6 @@ h1, h2, h3, p {
 </style>
 """
 
-# Appliquer le CSS RTL uniquement si la langue est l'arabe
 if st.session_state.lang == 'ar':
     st.markdown(RTL_CSS, unsafe_allow_html=True)
 
@@ -573,31 +576,28 @@ if st.session_state.lang == 'ar':
 # INTERFACE UTILISATEUR (SIDEBAR)
 # ==============================
 
-# MODIFIÉ : Logo plus petit
-st.sidebar.image("logo.png", width=64)
+if isinstance(LOGO_PATH, str) and os.path.exists(LOGO_PATH):
+    st.sidebar.image(LOGO_PATH, width=64)
+else:
+    st.sidebar.markdown(f"<h1 style='text-align: center; color: white;'>{LOGO_PATH}</h1>", unsafe_allow_html=True)
 
-# MODIFIÉ : Sélecteur de langue avec drapeaux (remplace st.radio)
 st.sidebar.write(t('lang_select') + ":")
 cols = st.sidebar.columns(3)
-
-if cols[0].button("🇫🇷", use_container_width=True): # Français
+if cols[0].button("🇫🇷", use_container_width=True):
     if st.session_state.lang != 'fr':
         st.session_state.lang = 'fr'
         st.rerun()
-
-if cols[1].button("🇬🇧", use_container_width=True): # English
+if cols[1].button("🇬🇧", use_container_width=True):
     if st.session_state.lang != 'en':
         st.session_state.lang = 'en'
         st.rerun()
-
-if cols[2].button("🇩🇿", use_container_width=True): # Arabe (Drapeau Algérie)
+if cols[2].button("🇩🇿", use_container_width=True):
     if st.session_state.lang != 'ar':
         st.session_state.lang = 'ar'
         st.rerun()
 
-st.sidebar.divider() # Ajout d'un séparateur visuel
+st.sidebar.divider()
 
-# Sélecteur de page (Inchangé)
 page_options = {
     'home': t('page_home'),
     'faq': t('page_faq'),
@@ -637,46 +637,37 @@ def load_data(symbol, sector, years_of_data):
 def prepare_data(df, features):
     target_col_name = features[0]
     df_copy = df.copy()
-
     df_copy = df_copy[df_copy[target_col_name] > 0]
     if df_copy.empty:
         st.error(t('prep_error_positive'))
         return (None,) * 7
-        
     df_copy[TARGET_COL_ORIG_NAME] = df_copy[target_col_name]
     df_copy[target_col_name] = np.log(df_copy[target_col_name] / df_copy[target_col_name].shift(1))
     df_copy = df_copy.dropna()
-
     if df_copy.empty:
         st.error(t('prep_error_log'))
         return (None,) * 7
-
     df_scaled = pd.DataFrame(index=df_copy.index)
     price_scaler = MinMaxScaler(feature_range=(0, 1))
     df_scaled[target_col_name] = price_scaler.fit_transform(df_copy[[target_col_name]])
-
     feature_scalers = {}
     if len(features) > 1:
         for feature in features[1:]:
             scaler = MinMaxScaler(feature_range=(0, 1))
             df_scaled[feature] = scaler.fit_transform(df_copy[[feature]])
             feature_scalers[feature] = scaler
-
     scaled_data = df_scaled.values
     X, y = [], []
     for i in range(LOOK_BACK, len(scaled_data)):
         X.append(scaled_data[i-LOOK_BACK:i, :])
         y.append(scaled_data[i, 0])
     X, y = np.array(X), np.array(y)
-    
     if len(X) == 0:
         st.error(f"{t('prep_error_seq')} (Lookback = {LOOK_BACK}).")
         return (None,) * 7
-
     split = int(len(X) * 0.8)
     X_train, X_test = X[:split], X[split:]
     y_train, y_test = y[:split], y[split:]
-    
     return X_train, y_train, X_test, y_test, price_scaler, feature_scalers, df_copy
 
 def build_model(hp, input_shape, complexity='Complexe'):
@@ -689,27 +680,23 @@ def build_model(hp, input_shape, complexity='Complexe'):
     else:
         model.add(layers.LSTM(units=hp.Int('units_1', 32, 256, 32), return_sequences=False, input_shape=input_shape, name='lstm_1'))
         model.add(layers.Dropout(hp.Float('dropout_1', 0.1, 0.5, 0.1), name='dropout_1'))
-    
     model.add(layers.Dense(1, name='output_layer'))
     lr = hp.Float('learning_rate', min_value=1e-4, max_value=2e-3, sampling='log')
     model.compile(optimizer=keras.optimizers.Adam(lr), 
-                    loss='mean_squared_error',
-                    metrics=['mae']) 
+                   loss='mean_squared_error',
+                   metrics=['mae']) 
     return model
 
 def generate_prediction_commentary(start_price, df_future, symbol_name, t_func):
     try:
         end_price = df_future['Prévision'].iloc[-1]
         end_date = df_future.index[-1]
-        
         total_change_pct = ((end_price / start_price) - 1) * 100
         if total_change_pct > 0:
             global_trend = f"{t_func('comment_rise')} **{total_change_pct:.2f}%**"
         else:
             global_trend = f"{t_func('comment_fall')} **{total_change_pct:.2f}%**"
-        
         commentary = [f"{t_func('comment_trend')} {global_trend} {t_func('comment_for')} {symbol_name}, {t_func('comment_reaching')} **{end_price:.2f}** {t_func('comment_by')} {end_date.strftime('%d-%m-%Y')}."]
-        
         today = datetime.datetime.now().date()
         q_targets = []
         for i in range(1, 5):
@@ -719,10 +706,8 @@ def generate_prediction_commentary(start_price, df_future, symbol_name, t_func):
             elif next_q_month <= 6: q_date = datetime.date(next_q_year, 6, 30)
             elif next_q_month <= 9: q_date = datetime.date(next_q_year, 9, 30)
             else: q_date = datetime.date(next_q_year, 12, 31)
-            
             if q_date <= end_date.date():
                 q_targets.append((q_date.strftime('%Y-%m-%d'), f"{t_func('comment_q_end')} { (q_date.month - 1) // 3 + 1 } {q_date.year}"))
-        
         if q_targets:
             first_q_date_str, first_q_name = q_targets[0]
             try:
@@ -731,66 +716,43 @@ def generate_prediction_commentary(start_price, df_future, symbol_name, t_func):
                 commentary.append(f"{t_func('comment_q_trend')} **{q_price:.2f}** (soit **{q_change_pct:+.2f}%**) {t_func('comment_q_expected')} **{first_q_name}**.")
             except (KeyError, TypeError, IndexError):
                 pass
-
         return "\n\n".join(commentary)
-    
     except Exception as e:
         return f"Erreur lors de la génération du commentaire : {e}"
-
 
 # ==============================
 # ROUTAGE DES PAGES
 # ==============================
-
-# ------------------------------
-# --- PAGE 1 : ACCUEIL (OUTIL DE PRÉDICTION) ---
-# ------------------------------
 if selected_page_key == 'home':
-
     st.title(t('page_title'))
-
     horizon_options_display = t('horizons')
     complexity_options_display = t('complexities')
-
     st.sidebar.header(t('base_params'))
     sector_display = st.sidebar.selectbox(t('category'), list(CATEGORIES.keys()))
     symbol_name_display = st.sidebar.selectbox(t('predict_asset'), list(CATEGORIES[sector_display].keys()))
     symbol = CATEGORIES[sector_display][symbol_name_display]
-
     selected_horizon_display = st.sidebar.selectbox(t('horizon'), horizon_options_display)
     horizon_key = HORIZON_KEYS[horizon_options_display.index(selected_horizon_display)]
     train_years = HORIZON_MAP[horizon_key]["train_years"]
     future_days = HORIZON_MAP[horizon_key]["predict_days"]
-
-
     st.sidebar.header(t('train_params'))
     selected_complexity_display = st.sidebar.selectbox(t('model_complexity'), complexity_options_display, index=1)
     complexity_key = COMPLEXITY_KEYS[complexity_options_display.index(selected_complexity_display)]
-
-
     max_trials = st.sidebar.number_input(t('optim_trials'), 1, 20, 10, 1)
     epochs = st.sidebar.number_input(t('train_epochs'), 10, 100, 50, 5)
 
-
-    # ==============================
-    # FLUX DE L'APPLICATION
-    # (Inchangé)
-    # ==============================
     try:
         df_original, target_col, features_used = load_data(symbol, sector_display, train_years)
         st.subheader(f"{t('hist_data')} - {symbol_name_display}")
         info_text = f"{t('info_analysis')} **{t('info_log_return')} {target_col}**"
         if len(features_used) > 1: info_text += f" {t('info_and')} **Log({', '.join(features_used[1:])})**."
         st.info(info_text)
-        
         with st.container(border=True):
             st.line_chart(df_original[target_col])
-        
         prep_results = prepare_data(df_original, features_used)
         if prep_results[0] is None:
             st.stop()
         X_train, y_train, X_test, y_test, price_scaler, feature_scalers, df_processed = prep_results
-
     except Exception as e:
         st.error(f"{t('data_error')}: {e}")
         st.stop()
@@ -805,11 +767,9 @@ if selected_page_key == 'home':
                 directory='kt_dir', project_name=f'project_{symbol}_{complexity_arg}', overwrite=True
             )
             tuner.search(X_train, y_train, epochs=20, validation_split=0.2, verbose=0,
-                            callbacks=[keras.callbacks.EarlyStopping('val_loss', patience=5)])
+                         callbacks=[keras.callbacks.EarlyStopping('val_loss', patience=5)])
             best_hp = tuner.get_best_hyperparameters(num_trials=1)[0]
-        
         st.success(t('success_optim'))
-
         with st.spinner(f"{t('spinner_train')} (max {epochs} {t('train_epochs').lower().split()[-1]})..."):
             best_model = tuner.hypermodel.build(best_hp)
             early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
@@ -821,9 +781,7 @@ if selected_page_key == 'home':
                 callbacks=[early_stopping],
                 verbose=0
             )
-            
         st.success(t('success_train'))
-
         st.session_state['model'] = best_model
         st.session_state['history'] = history.history
         st.session_state['best_hp'] = best_hp
@@ -837,15 +795,10 @@ if selected_page_key == 'home':
         st.session_state['trained_horizon'] = horizon_key
         st.session_state['trained_complexity'] = complexity_key
 
-    # ========================================
-    # AFFICHAGE DES RÉSULTATS
-    # (Inchangé)
-    # ========================================
-
     is_model_stale = not ('model' in st.session_state and
-                            st.session_state.get('trained_symbol') == symbol and
-                            st.session_state.get('trained_horizon') == horizon_key and
-                            st.session_state.get('trained_complexity') == complexity_key)
+                           st.session_state.get('trained_symbol') == symbol and
+                           st.session_state.get('trained_horizon') == horizon_key and
+                           st.session_state.get('trained_complexity') == complexity_key)
 
     if not is_model_stale:
         model = st.session_state['model']
@@ -857,7 +810,6 @@ if selected_page_key == 'home':
         df_history_processed = st.session_state['df_processed']
         features_used = st.session_state['features_used']
         target_col = st.session_state['target_col']
-        
         prep_results_full = prepare_data(df_history_original, features_used)
         if prep_results_full[0] is not None:
             _, _, _, _, _, _, df_processed_full = prep_results_full
@@ -866,30 +818,24 @@ if selected_page_key == 'home':
             st.error("Impossible de recalculer les données pour l'affichage.")
             st.stop()
 
-
         tab_perf, tab_eval, tab_proj = st.tabs([
             t('tab_perf'), 
             t('tab_eval'), 
             t('tab_proj')
         ])
-
         with tab_perf:
             st.subheader(t('perf_title'))
-            
             with st.container(border=True):
                 col1, col2 = st.columns(2)
                 with col1:
                     st.write(f"**{t('hp_title')}**")
                     hp_md = f"- **{t('hp_units')}:** `{best_hp_data.get('units_1')}`\n"
                     hp_md += f"- **{t('hp_dropout')}:** `{best_hp_data.get('dropout_1'):.2f}`\n"
-                    
                     if complexity_key == 'complex':
                         hp_md += f"- **{t('hp_units_2')}:** `{best_hp_data.get('units_2')}`\n"
                         hp_md += f"- **{t('hp_dropout_2')}:** `{best_hp_data.get('dropout_2'):.2f}`\n"
-                        
                     hp_md += f"- **{t('hp_lr')}:** `{best_hp_data.get('learning_rate'):.6f}`"
                     st.markdown(hp_md, unsafe_allow_html=True if st.session_state.lang == 'ar' else False)
-                
                 with col2:
                     st.write(f"**{t('metrics_title')}**")
                     final_val_loss = history_data['val_loss'][-1]
@@ -897,7 +843,6 @@ if selected_page_key == 'home':
                     st.metric(t('metrics_val_loss'), f"{final_val_loss:.6f}")
                     st.metric(t('metrics_val_mae'), f"{final_val_mae:.6f}")
                     st.caption(t('metrics_caption'))
-
             st.write(f"**{t('charts_title')}**")
             with st.container(border=True):
                 col1, col2 = st.columns(2)
@@ -907,46 +852,37 @@ if selected_page_key == 'home':
                     fig_loss.add_trace(go.Scatter(y=history_data['val_loss'], name=t('chart_loss_val'), line=dict(color='#FF6B00')))
                     fig_loss.update_layout(title=t('chart_loss_title'), xaxis_title='Époques', yaxis_title='Perte')
                     st.plotly_chart(fig_loss, use_container_width=True)
-
                 with col2:
                     fig_mae = go.Figure()
                     fig_mae.add_trace(go.Scatter(y=history_data['mae'], name=t('chart_mae_train'), line=dict(color='#0A2342')))
                     fig_mae.add_trace(go.Scatter(y=history_data['val_mae'], name=t('chart_mae_val'), line=dict(color='#FF6B00')))
                     fig_mae.update_layout(title=t('chart_mae_title'), xaxis_title='Époques', yaxis_title='MAE')
                     st.plotly_chart(fig_mae, use_container_width=True)
-
         with tab_eval:
             st.subheader(t('eval_title'))
-            
             prep_results_eval = prepare_data(df_history_original, features_used)
             if prep_results_eval[0] is None:
                 st.error(t('eval_error'))
             else:
                 _, _, X_test_eval, y_test_eval, _, _, df_processed_eval = prep_results_eval
-                
                 if len(X_test_eval) == 0:
                     st.warning("Pas assez de données pour un jeu de test. Essayez un horizon de données plus long.")
                 else:
                     preds_scaled = model.predict(X_test_eval)
                     preds_log_returns = price_scaler.inverse_transform(preds_scaled)
-                    
                     test_start_index = X_train_len + LOOK_BACK
-                    
                     if test_start_index < len(df_processed_eval) and (test_start_index - 1) < len(df_processed_eval):
                         y_test_true_prices = df_processed_eval[TARGET_COL_ORIG_NAME].iloc[test_start_index:].values
                         y_test_previous_prices = df_processed_eval[TARGET_COL_ORIG_NAME].iloc[test_start_index - 1 : -1].values
-                    
                         if len(y_test_previous_prices) == len(preds_log_returns):
                             preds_rescaled = y_test_previous_prices * np.exp(preds_log_returns.flatten())
                             y_test_rescaled = y_test_true_prices
-                            
                             with st.container(border=True):
                                 rmse = np.sqrt(mean_squared_error(y_test_rescaled, preds_rescaled))
                                 mae = mean_absolute_error(y_test_rescaled, preds_rescaled)
                                 col1, col2 = st.columns(2)
                                 col1.metric(t('eval_rmse'), f"{rmse:.4f}")
                                 col2.metric(t('eval_mae'), f"{mae:.4f}")
-
                             with st.container(border=True):
                                 fig_compare = go.Figure()
                                 test_dates = df_processed_eval.index[test_start_index:]
@@ -954,7 +890,6 @@ if selected_page_key == 'home':
                                 fig_compare.add_trace(go.Scatter(x=test_dates, y=preds_rescaled.flatten(), mode='lines', name=t('eval_pred'), line=dict(color='#FF6B00', dash='dash')))
                                 fig_compare.update_layout(title_text=t('eval_chart_title'), hovermode="x unified")
                                 st.plotly_chart(fig_compare, use_container_width=True)
-                            
                             if st.toggle(t('eval_toggle')):
                                 results_df = pd.DataFrame({'Date': test_dates, 'Valeur Réelle': y_test_rescaled.flatten(), 'Prédiction': preds_rescaled.flatten()})
                                 st.dataframe(results_df.set_index('Date'))
@@ -962,8 +897,6 @@ if selected_page_key == 'home':
                             st.error(t('align_error'))
                     else:
                         st.error("Erreur d'indexation lors de la création du jeu de test.")
-
-
         with tab_proj:
             st.subheader(f"{t('proj_title')} ({selected_horizon_display})")
             with st.spinner(t('proj_spinner')):
@@ -972,18 +905,15 @@ if selected_page_key == 'home':
                 last_60_days_scaled[target_col] = price_scaler.transform(last_60_days_processed[[target_col]])
                 for feature in features_used[1:]:
                     last_60_days_scaled[feature] = feature_scalers[feature].transform(last_60_days_processed[[feature]])
-                    
                 current_batch = last_60_days_scaled.values.reshape(1, LOOK_BACK, len(features_used))
                 future_preds_prices = []
                 last_known_price = df_history_processed[TARGET_COL_ORIG_NAME].iloc[-1]
-                
                 for _ in range(future_days):
                     pred_scaled_log_return = model.predict(current_batch, verbose=0)[0]
                     pred_log_return = price_scaler.inverse_transform(pred_scaled_log_return.reshape(1, -1))
                     new_price = last_known_price * np.exp(pred_log_return[0, 0])
                     future_preds_prices.append(new_price)
                     last_known_price = new_price
-                    
                     new_entry = np.zeros((1, 1, len(features_used)))
                     new_entry[0, 0, 0] = pred_scaled_log_return[0]
                     if len(features_used) > 1:
@@ -991,67 +921,47 @@ if selected_page_key == 'home':
                             mean_feature_val = current_batch[0, :, i+1].mean()
                             new_entry[0, 0, i+1] = mean_feature_val
                     current_batch = np.append(current_batch[:, 1:, :], new_entry, axis=1)
-                    
             future_preds_rescaled = np.array(future_preds_prices).flatten()
             future_dates = pd.date_range(start=df_history_processed.index[-1] + pd.Timedelta(days=1), periods=future_days, freq='B')
             df_future = pd.DataFrame(future_preds_rescaled, index=future_dates, columns=['Prévision'])
-            
             with st.container(border=True):
                 fig_future = go.Figure()
                 fig_future.add_trace(go.Scatter(x=df_history_original.index, y=df_history_original[target_col], mode='lines', name=t('proj_hist'), line=dict(color='#0A2342')))
                 fig_future.add_trace(go.Scatter(x=df_future.index, y=df_future['Prévision'], mode='lines', name=t('proj_future'), line=dict(color='#FF6B00', dash='dash')))
                 fig_future.update_layout(title_text=t('proj_chart_title'), hovermode="x unified")
                 st.plotly_chart(fig_future, use_container_width=True)
-
             st.subheader(t('proj_analysis_title'))
             with st.container(border=True):
                 last_price = df_history_processed[TARGET_COL_ORIG_NAME].iloc[-1]
                 comment_text = generate_prediction_commentary(last_price, df_future, symbol_name_display, t)
                 st.markdown(comment_text, unsafe_allow_html=True if st.session_state.lang == 'ar' else False)
-
             csv = df_future.to_csv().encode('utf-8')
             st.download_button(t('proj_download'), csv, f"forecast_{symbol}.csv", "text/csv")
 
-
-# ------------------------------
-# --- PAGE 2 : FAQ ---
-# (Inchangé)
-# ------------------------------
 elif selected_page_key == 'faq':
     st.title(t('faq_title'))
-    
     with st.container(border=True):
         st.subheader(t('faq_step1_title'))
         st.markdown(t('faq_step1_desc'))
-        
         st.subheader(t('faq_step2_title'))
         st.markdown(t('faq_step2_desc'))
-
         st.subheader(t('faq_step3_title'))
         st.markdown(t('faq_step3_desc'))
-
         st.subheader(t('faq_step4_title'))
         st.markdown(t('faq_step4_desc'))
-
         st.subheader(t('faq_step5_title'))
         st.markdown(t('faq_step5_desc'))
-
         st.subheader(t('faq_step6_title'))
         st.markdown(t('faq_step6_desc'))
 
-# ------------------------------
-# --- PAGE 3 : CONTACT ---
-# (Inchangé)
-# ------------------------------
 elif selected_page_key == 'contact':
     st.title(t('contact_title'))
-    
     with st.container(border=True):
         st.markdown(t('contact_info'))
-        
         st.markdown(f"### {t('contact_name')}")
         st.markdown(f"**{t('contact_job_title')}**")
         st.divider()
         st.markdown(f"**{t('contact_email')} :** Haithem-Berkane@outlook.fr")
         st.markdown(f"**{t('contact_phone')} :** +213 661 338 333")
         st.markdown(f"**{t('contact_address')} :** Algeria")
+
