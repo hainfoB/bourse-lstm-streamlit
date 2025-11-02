@@ -17,13 +17,14 @@ import keras_tuner as kt
 
 import pandas_datareader.data as web
 
+# --- Gestion du chemin du Logo ---
 try:
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     LOGO_PATH = os.path.join(SCRIPT_DIR, "logo.png")
     if not os.path.exists(LOGO_PATH):
-        LOGO_PATH = "🚀"
+        LOGO_PATH = "🚀" # Fallback emoji
 except NameError:
-    LOGO_PATH = "logo.png"
+    LOGO_PATH = "logo.png" # Fallback pour les environnements où __file__ n'est pas défini
 
 # ==============================
 # CONFIGURATION
@@ -420,6 +421,7 @@ CATEGORIES = {
 # ==============================
 # CSS STYLING
 # ==============================
+# Correction CSS : Utilisation de sélecteurs robustes
 CSS_STYLE = """
 <style>
 /* Arrière-plan principal de l'application */
@@ -432,31 +434,25 @@ CSS_STYLE = """
 }
 
 /* --- DÉBUT DE LA CORRECTION CSS --- */
-
 /* Cible tous les textes (paragraphes) DANS la sidebar */
 [data-testid="stSidebar"] p {
     color: #FDF8E3; /* Beige clair pour le texte */
 }
-
 /* Cible tous les labels de widgets (radio, selectbox, etc.) DANS la sidebar */
 [data-testid="stSidebar"] label {
     color: #FDF8E3 !important; /* Beige clair, !important pour forcer */
 }
-
 /* Cible tous les en-têtes (h1, h2, h3) DANS la sidebar */
 [data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3 {
     color: #FDF8E3; /* Beige clair pour le texte */
 }
-
 /* Cible spécifiquement le texte à l'intérieur des selectbox (la valeur sélectionnée) */
 [data-testid="stSidebar"] [data-testid="stSelectbox"] [data-testid="stMarkdownContainer"] p {
      color: #FDF8E3;
 }
-
 /* --- FIN DE LA CORRECTION CSS --- */
-
 
 /* Titre principal */
 h1 {
@@ -520,17 +516,14 @@ h2, h3 {
 """
 st.markdown(CSS_STYLE, unsafe_allow_html=True)
 
+# CSS pour RTL (Arabe)
 RTL_CSS = """
 <style>
 body, .main, [data-testid="stSidebar"] {
     direction: rtl !important;
 }
-[data-testid="stSidebar"] .st-emotion-cache-16txtl3, 
-[data-testid="stSidebar"] .st-emotion-cache-183lzff,
-[data-testid="stSidebar"] .st-emotion-cache-1d8k8ss p,
-[data-testid="stSidebar"] .st-emotion-cache-16idsys p {
-    text-align: right !important;
-}
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label,
 [data-testid="stSidebar"] h1, 
 [data-testid="stSidebar"] h2, 
 [data-testid="stSidebar"] h3 {
@@ -555,9 +548,6 @@ h1, h2, h3, p {
 [data-testid="stSidebar"] [data-testid="stRadio"] label {
     margin-left: 0.5rem;
     margin-right: 0;
-}
-[data-testid="stTabs"] {
-    width: 100%;
 }
 [data-testid="stTabs"] [role="tablist"] {
     justify-content: flex-end;
@@ -611,7 +601,7 @@ selected_page_key = st.sidebar.radio(
 )
 
 # ==============================
-# FONCTIONS (LOGIQUE INCHANGÉE)
+# FONCTIONS (LOGIQUE MÉTIER)
 # ==============================
 @st.cache_data
 def load_data(symbol, sector, years_of_data):
@@ -727,6 +717,7 @@ if selected_page_key == 'home':
     st.title(t('page_title'))
     horizon_options_display = t('horizons')
     complexity_options_display = t('complexities')
+    
     st.sidebar.header(t('base_params'))
     sector_display = st.sidebar.selectbox(t('category'), list(CATEGORIES.keys()))
     symbol_name_display = st.sidebar.selectbox(t('predict_asset'), list(CATEGORIES[sector_display].keys()))
@@ -735,11 +726,27 @@ if selected_page_key == 'home':
     horizon_key = HORIZON_KEYS[horizon_options_display.index(selected_horizon_display)]
     train_years = HORIZON_MAP[horizon_key]["train_years"]
     future_days = HORIZON_MAP[horizon_key]["predict_days"]
+    
     st.sidebar.header(t('train_params'))
-    selected_complexity_display = st.sidebar.selectbox(t('model_complexity'), complexity_options_display, index=1)
+    
+    # --- OPTIMISATION CLOUD : Réduction des valeurs par défaut ---
+    selected_complexity_display = st.sidebar.selectbox(
+        t('model_complexity'), 
+        complexity_options_display, 
+        index=0  # <-- MODIFIÉ : "Simple" par défaut pour économiser la RAM
+    )
     complexity_key = COMPLEXITY_KEYS[complexity_options_display.index(selected_complexity_display)]
-    max_trials = st.sidebar.number_input(t('optim_trials'), 1, 20, 10, 1)
-    epochs = st.sidebar.number_input(t('train_epochs'), 10, 100, 50, 5)
+    max_trials = st.sidebar.number_input(
+        t('optim_trials'), 1, 20, 
+        value=5,  # <-- MODIFIÉ : 5 essais par défaut au lieu de 10
+        step=1
+    )
+    epochs = st.sidebar.number_input(
+        t('train_epochs'), 10, 100, 
+        value=30, # <-- MODIFIÉ : 30 époques par défaut au lieu de 50
+        step=5
+    )
+    # --- FIN OPTIMISATION CLOUD ---
 
     try:
         df_original, target_col, features_used = load_data(symbol, sector_display, train_years)
@@ -794,7 +801,7 @@ if selected_page_key == 'home':
         st.session_state['trained_symbol'] = symbol
         st.session_state['trained_horizon'] = horizon_key
         st.session_state['trained_complexity'] = complexity_key
-        st.session_state['trained_X_train_len'] = len(X_train) # <-- CORRECTION : Sauvegarder la taille réelle
+        st.session_state['trained_X_train_len'] = len(X_train) # Correction alignement
 
     is_model_stale = not ('model' in st.session_state and
                            st.session_state.get('trained_symbol') == symbol and
@@ -812,16 +819,11 @@ if selected_page_key == 'home':
         features_used = st.session_state['features_used']
         target_col = st.session_state['target_col']
         
-        # --- CORRECTION : Récupérer la taille sauvegardée ---
         if 'trained_X_train_len' in st.session_state:
             X_train_len = st.session_state['trained_X_train_len']
         else:
-            # Sécurité au cas où l'état serait corrompu (ex: ancien modèle sauvegardé)
             st.warning("L'état de session est ancien. Veuillez ré-entraîner le modèle pour une évaluation précise.")
             st.stop()
-        
-        # --- SUPPRESSION BLOC REDONDANT ---
-        # Le bloc 'prep_results_full' a été supprimé car il était redondant et bogué.
 
         tab_perf, tab_eval, tab_proj = st.tabs([
             t('tab_perf'), 
@@ -875,14 +877,10 @@ if selected_page_key == 'home':
                 else:
                     preds_scaled = model.predict(X_test_eval)
                     preds_log_returns = price_scaler.inverse_transform(preds_scaled)
-                    
-                    # CORRECTION : test_start_index utilise X_train_len (qui est correct maintenant)
                     test_start_index = X_train_len + LOOK_BACK
-                    
                     if test_start_index < len(df_processed_eval) and (test_start_index - 1) < len(df_processed_eval):
                         y_test_true_prices = df_processed_eval[TARGET_COL_ORIG_NAME].iloc[test_start_index:].values
                         y_test_previous_prices = df_processed_eval[TARGET_COL_ORIG_NAME].iloc[test_start_index - 1 : -1].values
-                        
                         if len(y_test_previous_prices) == len(preds_log_returns):
                             preds_rescaled = y_test_previous_prices * np.exp(preds_log_returns.flatten())
                             y_test_rescaled = y_test_true_prices
@@ -947,6 +945,9 @@ if selected_page_key == 'home':
             csv = df_future.to_csv().encode('utf-8')
             st.download_button(t('proj_download'), csv, f"forecast_{symbol}.csv", "text/csv")
 
+# ------------------------------
+# --- PAGE 2 : FAQ ---
+# ------------------------------
 elif selected_page_key == 'faq':
     st.title(t('faq_title'))
     with st.container(border=True):
@@ -963,6 +964,9 @@ elif selected_page_key == 'faq':
         st.subheader(t('faq_step6_title'))
         st.markdown(t('faq_step6_desc'))
 
+# ------------------------------
+# --- PAGE 3 : CONTACT ---
+# ------------------------------
 elif selected_page_key == 'contact':
     st.title(t('contact_title'))
     with st.container(border=True):
@@ -973,3 +977,4 @@ elif selected_page_key == 'contact':
         st.markdown(f"**{t('contact_email')} :** Haithem-Berkane@outlook.fr")
         st.markdown(f"**{t('contact_phone')} :** +213 661 338 333")
         st.markdown(f"**{t('contact_address')} :** Algeria")
+
