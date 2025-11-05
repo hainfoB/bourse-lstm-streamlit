@@ -30,7 +30,7 @@ except NameError:
 # CONFIGURATION
 # ==============================
 st.set_page_config(
-    page_title="Haithem Vision Predict V4.4 (Stable)",
+    page_title="Haithem Vision Predict V3.1 (Stable)",
     layout="wide",
     page_icon=LOGO_PATH,
 )
