@@ -30,7 +30,7 @@ except NameError:
 # CONFIGURATION
 # ==============================
 st.set_page_config(
-    page_title="Haithem Vision Predict V3.5",
+    page_title="Haithem Vision Predict V5.0 (AutoML)",
     layout="wide",
     page_icon=LOGO_PATH,
 )
@@ -40,7 +40,7 @@ st.set_page_config(
 # ==============================
 translations = {
     'fr': {
-        'page_title': "🚀 Haithem Vision Predict V3.5",
+        'page_title': "🚀 Haithem Vision Predict V5.0 (AutoML)",
         'lang_select': "Langue",
         
         'navigation': "Navigation",
@@ -283,7 +283,7 @@ CSS_STYLE = """
 [data-testid="stSidebar"] [data-testid="stSelectbox"] [data-testid="stMarkdownContainer"] p {
     color: #FDF8E3 !important; /* Beige clair, !important pour forcer */
 }
-/* Cibler spécifiquement les métriques dans la sidebar */
+/* Cibler spécifiquement les métriques (NON-VOLATILITÉ) dans la sidebar */
 [data-testid="stSidebar"] [data-testid="stMetric"] {
     color: #FDF8E3 !important;
 }
@@ -293,6 +293,28 @@ CSS_STYLE = """
 [data-testid="stSidebar"] [data-testid="stMetric"] [data-testid="stMarkdownContainer"] p {
      color: #FDF8E3 !important;
 }
+
+/* --- NOUVEAU : CSS pour la métrique de volatilité custom --- */
+.custom-volatility-metric {
+    position: relative;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+.custom-volatility-metric label {
+    color: #FDF8E3 !important; /* Label en beige/blanc */
+    font-size: 0.875rem; /* 14px */
+    display: block;
+}
+.custom-volatility-metric div {
+    color: #FF6B00 !important; /* Valeur en ORANGE */
+    font-size: 1.75rem; /* 28px, plus grand comme st.metric */
+    font-weight: 600;
+    padding-top: 0.25rem;
+    line-height: 1.3;
+}
+/* --- FIN NOUVEAU --- */
+
+
 /* --- FIN DE LA CORRECTION CSS --- */
 
 /* Titre principal */
@@ -336,7 +358,8 @@ h1, h2, h3, p { text-align: right !important; }
     text-align: right !important; direction: rtl !important;
 }
 /* Inversion label/valeur pour les métriques en RTL */
-[data-testid="stSidebar"] [data-testid="stMetric"] {
+[data-testid="stSidebar"] [data-testid="stMetric"],
+.custom-volatility-metric { /* Ajout de la classe custom */
     display: flex;
     flex-direction: column-reverse;
 }
@@ -510,7 +533,17 @@ if selected_page_key == 'home':
         # 1. Calculer la volatilité
         log_returns = np.log(df_original[target_col] / df_original[target_col].shift(1)).dropna()
         annualized_volatility = log_returns.std() * np.sqrt(252) # 252 jours de trading
-        st.sidebar.metric(t('volatility'), f"{annualized_volatility:.2%}")
+        
+        # --- MODIFICATION : Remplacer st.metric par st.markdown ---
+        volatility_label = t('volatility')
+        volatility_value = f"{annualized_volatility:.2%}"
+        st.sidebar.markdown(f"""
+        <div class="custom-volatility-metric">
+            <label>{volatility_label}</label>
+            <div>{volatility_value}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        # --- FIN MODIFICATION ---
         
         # 2. Choisir les paramètres dynamiquement
         if annualized_volatility > 0.30: # Seuil pour actifs volatils (Crypto, certaines actions)
