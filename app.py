@@ -30,7 +30,7 @@ except NameError:
 # CONFIGURATION
 # ==============================
 st.set_page_config(
-    page_title="Haithem Vision Predict V3.1 (Stable)",
+    page_title="Haithem Vision Predict V3.5",
     layout="wide",
     page_icon=LOGO_PATH,
 )
@@ -40,7 +40,7 @@ st.set_page_config(
 # ==============================
 translations = {
     'fr': {
-        'page_title': "🚀 Haithem Vision Predict V3.1 (Stable)",
+        'page_title': "🚀 Haithem Vision Predict V3.5",
         'lang_select': "Langue",
         
         'navigation': "Navigation",
@@ -57,8 +57,8 @@ translations = {
         'faq_step3_desc': "Dans 'Paramètres de Base', choisissez une 'Catégorie' (ex: Actions US) puis un 'Actif à prédire' (ex: Apple).",
         'faq_step4_title': "Étape 4 : Choisir un horizon",
         'faq_step4_desc': "Sélectionnez l' 'Horizon de prédiction' (ex: 1 an). Cela détermine la durée de la prévision future et la quantité de données historiques utilisées pour l'entraînement.",
-        'faq_step5_title': "Étape 5 : Lancer l'entraînement",
-        'faq_step5_desc': "Cliquez sur le bouton '🚀 Optimiser et Entraîner le Modèle'. Vous pouvez ajuster les 'Paramètres d'Entraînement' (complexité, essais) pour affiner le modèle, mais les réglages par défaut sont recommandés pour commencer.",
+        'faq_step5_title': "Étape 5 : Lancer l'analyse",
+        'faq_step5_desc': "Cliquez sur le bouton '🚀 Lancer l'Analyse Automatique'. L'IA va analyser la volatilité de l'actif, choisir le meilleur type de modèle (Simple ou Complexe) et l'entraîner automatiquement.",
         'faq_step6_title': "Étape 6 : Analyser les résultats",
         'faq_step6_desc': "Une fois l'entraînement terminé, trois onglets apparaissent :\n- **🔬 Performance Modèle :** Affiche les détails du modèle et les courbes d'apprentissage.\n- **📏 Évaluation Test :** Compare les prédictions du modèle aux données réelles (non vues) pour évaluer sa précision.\n- **🔮 Projection Future :** Montre la prévision pour l'horizon choisi, avec une analyse et une option de téléchargement.",
 
@@ -75,16 +75,21 @@ translations = {
         'predict_asset': "Actif à prédire",
         'horizon': "Horizon de prédiction",
         'horizons': ["6 mois", "1 an", "3 ans", "5 ans"],
-        'train_params': "🛠️ Paramètres d'Entraînement",
-        'model_complexity': "Complexité du Modèle",
-        'complexities': ["Simple (1 couche - Rapide)", "Complexe (2 couches - Précis)"],
-        'optim_trials': "Essais d'optimisation",
-        'train_epochs': "Époques d'entraînement final",
+        
+        # NOUVEAU : Textes pour l'automatisation
+        'train_params_auto': "🛠️ Analyse AutoML (Automatique)",
+        'volatility': "Volatilité Annuelle",
+        'model_selected': "Modèle Sélectionné",
+        'trials_selected': "Essais d'Optimisation",
+        'epochs_selected': "Époques (Max)",
+        'high_vol_complex': "Élevée (Modèle Complexe)",
+        'low_vol_simple': "Faible (Modèle Simple)",
+        
         'hist_data': "📊 Données historiques",
         'info_analysis': "Analyse basée sur le",
-        'info_log_return': "Prix de", # Changé 'Log-Retour' en 'Prix'
+        'info_log_return': "Prix de",
         'info_and': "et",
-        'run_button': "🚀 Optimiser et Entraîner le Modèle",
+        'run_button': "🚀 Lancer l'Analyse Automatique", # Modifié
         'spinner_optim': "Optimisation en cours",
         'success_optim': "✅ Hyperparamètres optimisés. Entraînement final en cours...",
         'spinner_train': "Entraînement final du meilleur modèle",
@@ -102,7 +107,7 @@ translations = {
         'metrics_title': "Métriques d'Entraînement Finales :",
         'metrics_val_loss': "Perte de Validation Finale (val_loss)",
         'metrics_val_mae': "Erreur de Validation Finale (val_mae)",
-        'metrics_caption': "Métriques basées sur les données normalisées.", # Modifié
+        'metrics_caption': "Métriques basées sur les données normalisées.",
         'charts_title': "Courbes d'Apprentissage :",
         'chart_loss_title': "Évolution de la Perte (MSE)",
         'chart_loss_train': "Train Loss (MSE)",
@@ -121,7 +126,7 @@ translations = {
         'align_error': "Erreur d'alignement des données lors de l'évaluation.",
         'proj_title': "Projection Future",
         'proj_spinner': "Génération des prévisions...",
-        'proj_chart_title': "Projection Future (basée sur les PRIX)", # Modifié
+        'proj_chart_title': "Projection Future (basée sur les PRIX)",
         'proj_hist': "Historique (Prix)",
         'proj_future': "Prévision Future (Prix)",
         'proj_analysis_title': "💬 Analyse de la Projection",
@@ -141,16 +146,30 @@ translations = {
         'prep_error_seq': "Pas assez de données pour créer des séquences",
     },
     'en': {
-        'info_log_return': "Price of",
-        'metrics_caption': "Metrics based on scaled data.",
-        'proj_chart_title': "Future Projection (based on PRICE)",
-        # ... (les autres traductions EN sont complètes)
+        # ... (ajoutez les nouvelles clés pour l'anglais)
+        'page_title': "🚀 Haithem Vision Predict V5.0 (AutoML)",
+        'faq_step5_desc': "Click the '🚀 Run Automatic Analysis' button. The AI will analyze the asset's volatility, choose the best model type (Simple or Complex), and train it automatically.",
+        'train_params_auto': "🛠️ AutoML Parameters (Automatic)",
+        'volatility': "Annualized Volatility",
+        'model_selected': "Selected Model",
+        'trials_selected': "Optimization Trials",
+        'epochs_selected': "Epochs (Max)",
+        'high_vol_complex': "High (Complex Model)",
+        'low_vol_simple': "Low (Simple Model)",
+        'run_button': "🚀 Run Automatic Analysis",
     },
     'ar': {
-        'info_log_return': "سعر",
-        'metrics_caption': ".المقاييس مبنية على البيانات المعدلة",
-        'proj_chart_title': "التوقع المستقبلي (مبni على السعر)",
-        # ... (les autres traductions AR sont complètes)
+        # ... (ajoutez les nouvelles clés pour l'arabe)
+        'page_title': "🚀 Haithem Vision Predict V5.0 (AutoML)",
+        'faq_step5_desc': "انقر على زر '🚀 تشغيل التحليل التلقائي'. سيقوم الذكاء الاصطناعي بتحليل تقلبات الأصل، واختيار أفضل نوع نموذج (بسيط أو معقد)، وتدريبه تلقائيًا.",
+        'train_params_auto': "🛠️ إعدادات AutoML (تلقائية)",
+        'volatility': "التقلب السنوي",
+        'model_selected': "النموذج المختار",
+        'trials_selected': "محاولات التحسين",
+        'epochs_selected': "مراحل التدريب (القصوى)",
+        'high_vol_complex': "مرتفع (نموذج معقد)",
+        'low_vol_simple': "منخفض (نموذج بسيط)",
+        'run_button': "🚀 تشغيل التحليل التلقائي",
     }
 }
 
@@ -162,17 +181,16 @@ def t(key):
     default_lang_dict = translations.get('fr', {})
     current_lang_dict = translations.get(st.session_state.lang, default_lang_dict)
     
-    fr_keys = set(default_lang_dict.keys())
-    for lang_dict in translations.values():
-        fr_keys.update(lang_dict.keys())
-    
-    # S'assurer que toutes les clés existent au moins en français (pour le fallback)
-    # (Cette partie est simplifiée car nous supposons que 'fr' est complet)
+    # S'assurer que le fallback est complet
+    for lang_key, lang_val in translations.items():
+        if lang_key != st.session_state.lang:
+            base_dict = translations.get(lang_key, {})
+            for k, v in base_dict.items():
+                if k not in current_lang_dict:
+                    current_lang_dict[k] = v # Fallback vers n'importe quelle autre langue si 'fr' est incomplet
     
     if key in current_lang_dict:
         return current_lang_dict[key]
-    elif key in default_lang_dict:
-        return default_lang_dict[key]
     return key
 
 HORIZON_KEYS = ['6m', '1y', '3y', '5y']
@@ -182,9 +200,8 @@ HORIZON_MAP = {
     '3y': {"train_years": 7, "predict_days": 3*365},
     '5y': {"train_years": 10, "predict_days": 5*365},
 }
-COMPLEXITY_KEYS = ['simple', 'complex']
+# COMPLEXITY_KEYS n'est plus nécessaire
 LOOK_BACK = 60
-# TARGET_COL_ORIG_NAME n'est plus nécessaire
 
 CATEGORIES = {
     "🌐 Indices Mondiaux (ETFs)": {
@@ -266,6 +283,16 @@ CSS_STYLE = """
 [data-testid="stSidebar"] [data-testid="stSelectbox"] [data-testid="stMarkdownContainer"] p {
     color: #FDF8E3 !important; /* Beige clair, !important pour forcer */
 }
+/* Cibler spécifiquement les métriques dans la sidebar */
+[data-testid="stSidebar"] [data-testid="stMetric"] {
+    color: #FDF8E3 !important;
+}
+[data-testid="stSidebar"] [data-testid="stMetric"] p {
+    color: #FDF8E3 !important;
+}
+[data-testid="stSidebar"] [data-testid="stMetric"] [data-testid="stMarkdownContainer"] p {
+     color: #FDF8E3 !important;
+}
 /* --- FIN DE LA CORRECTION CSS --- */
 
 /* Titre principal */
@@ -307,6 +334,11 @@ body, .main, [data-testid="stSidebar"] { direction: rtl !important; }
 h1, h2, h3, p { text-align: right !important; }
 [data-testid="stInfo"], [data-testid="stMetric"], [data-testid="stSuccess"], [data-testid="stError"] {
     text-align: right !important; direction: rtl !important;
+}
+/* Inversion label/valeur pour les métriques en RTL */
+[data-testid="stSidebar"] [data-testid="stMetric"] {
+    display: flex;
+    flex-direction: column-reverse;
 }
 .stButton > button {
     direction: ltr !important; text-align: right !important;
@@ -367,47 +399,33 @@ def load_data(symbol, sector, years_of_data):
         features = [col_to_select]
         if 'Volume' in df.columns and df['Volume'].sum() > 0:
             features.append('Volume')
-            # MODIFICATION : Log-transform du Volume
             df['Volume'] = np.log1p(df['Volume']) 
     df = df[features].dropna()
     return df, col_to_select, features
 
-# MODIFICATION : Retour à la prédiction de PRIX (stable)
 def prepare_data(df, features):
     target_col_name = features[0]
-    
-    # Créer un scaler juste pour la colonne cible (prix)
     price_scaler = MinMaxScaler(feature_range=(0, 1))
     df_scaled = pd.DataFrame(index=df.index)
     df_scaled[target_col_name] = price_scaler.fit_transform(df[[target_col_name]])
-
-    # Normaliser les autres features (Volume) si elles existent
     feature_scalers = {}
     if len(features) > 1:
         for feature in features[1:]:
             scaler = MinMaxScaler(feature_range=(0, 1))
             df_scaled[feature] = scaler.fit_transform(df[[feature]])
-            feature_scalers[feature] = scaler # Sauvegarder le scaler
-
+            feature_scalers[feature] = scaler
     scaled_data = df_scaled.values
-    
-    # Création des séquences
     X, y = [], []
     for i in range(LOOK_BACK, len(scaled_data)):
         X.append(scaled_data[i-LOOK_BACK:i, :])
-        y.append(scaled_data[i, 0]) # La cible est toujours la première colonne (prix)
-        
+        y.append(scaled_data[i, 0])
     X, y = np.array(X), np.array(y)
-    
     if len(X) == 0:
         st.error(f"{t('prep_error_seq')} (Lookback = {LOOK_BACK}).")
-        return (None,) * 7 # Ajuster le nombre de retours
-
+        return (None,) * 7
     split = int(len(X) * 0.8)
     X_train, X_test = X[:split], X[split:]
     y_train, y_test = y[:split], y[split:]
-    
-    # Correction : S'assurer que df est bien le df original/complet
     return X_train, y_train, X_test, y_test, price_scaler, feature_scalers, df
 
 def build_model(hp, input_shape, complexity='Complexe'):
@@ -465,37 +483,18 @@ def generate_prediction_commentary(start_price, df_future, symbol_name, t_func):
 # ==============================
 if selected_page_key == 'home':
     st.title(t('page_title'))
-    horizon_options_display = t('horizons')
-    complexity_options_display = t('complexities')
     
     st.sidebar.header(t('base_params'))
     sector_display = st.sidebar.selectbox(t('category'), list(CATEGORIES.keys()))
     symbol_name_display = st.sidebar.selectbox(t('predict_asset'), list(CATEGORIES[sector_display].keys()))
     symbol = CATEGORIES[sector_display][symbol_name_display]
+    
+    horizon_options_display = t('horizons')
     selected_horizon_display = st.sidebar.selectbox(t('horizon'), horizon_options_display)
     horizon_key = HORIZON_KEYS[horizon_options_display.index(selected_horizon_display)]
     train_years = HORIZON_MAP[horizon_key]["train_years"]
     future_days = HORIZON_MAP[horizon_key]["predict_days"]
     
-    st.sidebar.header(t('train_params'))
-    
-    selected_complexity_display = st.sidebar.selectbox(
-        t('model_complexity'), 
-        complexity_options_display, 
-        index=0  # <-- OPTIMISATION CLOUD : "Simple" par défaut
-    )
-    complexity_key = COMPLEXITY_KEYS[complexity_options_display.index(selected_complexity_display)]
-    max_trials = st.sidebar.number_input(
-        t('optim_trials'), 1, 20, 
-        value=5,  # <-- OPTIMISATION CLOUD : 5 essais par défaut
-        step=1
-    )
-    epochs = st.sidebar.number_input(
-        t('train_epochs'), 10, 100, 
-        value=30, # <-- OPTIMISATION CLOUD : 30 époques par défaut
-        step=5
-    )
-
     try:
         df_original, target_col, features_used = load_data(symbol, sector_display, train_years)
         st.subheader(f"{t('hist_data')} - {symbol_name_display}")
@@ -505,34 +504,57 @@ if selected_page_key == 'home':
         with st.container(border=True):
             st.line_chart(df_original[target_col])
         
-        # MODIFICATION : Logique de préparation de PRIX
+        # --- NOUVELLE LOGIQUE AUTO ---
+        st.sidebar.header(t('train_params_auto'))
+        
+        # 1. Calculer la volatilité
+        log_returns = np.log(df_original[target_col] / df_original[target_col].shift(1)).dropna()
+        annualized_volatility = log_returns.std() * np.sqrt(252) # 252 jours de trading
+        st.sidebar.metric(t('volatility'), f"{annualized_volatility:.2%}")
+        
+        # 2. Choisir les paramètres dynamiquement
+        if annualized_volatility > 0.30: # Seuil pour actifs volatils (Crypto, certaines actions)
+            complexity_arg = "Complexe"
+            max_trials_dynamic = 10
+            st.sidebar.markdown(f"**{t('model_selected')}:** {t('high_vol_complex')}")
+        else: # Actifs plus stables (Indices, Or, etc.)
+            complexity_arg = "Simple"
+            max_trials_dynamic = 5
+            st.sidebar.markdown(f"**{t('model_selected')}:** {t('low_vol_simple')}")
+            
+        epochs_dynamic = 100 # Valeur max, EarlyStopping s'en chargera
+        
+        st.sidebar.markdown(f"**{t('trials_selected')}:** `{max_trials_dynamic}`")
+        st.sidebar.markdown(f"**{t('epochs_selected')}:** `{epochs_dynamic}` (avec arrêt auto)")
+        # --- FIN LOGIQUE AUTO ---
+
         prep_results = prepare_data(df_original, features_used)
         if prep_results[0] is None:
             st.stop()
         X_train, y_train, X_test, y_test, price_scaler, feature_scalers, df_processed = prep_results
+        
     except Exception as e:
         st.error(f"{t('data_error')}: {e}")
         st.stop()
 
     if st.button(t('run_button')):
-        with st.spinner(f"{t('spinner_optim')} ({max_trials} {t('optim_trials').lower()})..."):
+        with st.spinner(f"{t('spinner_optim')} ({max_trials_dynamic} {t('trials_selected').lower()})..."):
             input_shape = (X_train.shape[1], X_train.shape[2])
-            complexity_arg = "Complexe" if "complex" in complexity_key else "Simple"
             tuner = kt.RandomSearch(
                 lambda hp: build_model(hp, input_shape, complexity=complexity_arg),
-                objective='val_loss', max_trials=max_trials, executions_per_trial=1,
+                objective='val_loss', max_trials=max_trials_dynamic, executions_per_trial=1,
                 directory='kt_dir', project_name=f'project_{symbol}_{complexity_arg}', overwrite=True
             )
             tuner.search(X_train, y_train, epochs=20, validation_split=0.2, verbose=0,
                          callbacks=[keras.callbacks.EarlyStopping('val_loss', patience=5)])
             best_hp = tuner.get_best_hyperparameters(num_trials=1)[0]
         st.success(t('success_optim'))
-        with st.spinner(f"{t('spinner_train')} (max {epochs} {t('train_epochs').lower().split()[-1]})..."):
+        with st.spinner(f"{t('spinner_train')} (max {epochs_dynamic} {t('epochs_selected').lower().split()[-1]})..."):
             best_model = tuner.hypermodel.build(best_hp)
             early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
             history = best_model.fit(
                 X_train, y_train,
-                epochs=epochs,
+                epochs=epochs_dynamic, # Utilise la valeur dynamique
                 validation_split=0.2,
                 batch_size=32,
                 callbacks=[early_stopping],
@@ -540,25 +562,24 @@ if selected_page_key == 'home':
             )
         st.success(t('success_train'))
         
-        # MODIFICATION : Sauvegarde de la session pour la prédiction de PRIX
         st.session_state['model'] = best_model
         st.session_state['history'] = history.history
         st.session_state['best_hp'] = best_hp
         st.session_state['price_scaler'] = price_scaler
         st.session_state['feature_scalers'] = feature_scalers
-        st.session_state['df_original'] = df_original # Sauvegarde du df original pour l'affichage
-        st.session_state['df_processed'] = df_processed # Sauvegarde du df traité
+        st.session_state['df_original'] = df_original
+        st.session_state['df_processed'] = df_processed
         st.session_state['features_used'] = features_used
         st.session_state['target_col'] = target_col
         st.session_state['trained_symbol'] = symbol
         st.session_state['trained_horizon'] = horizon_key
-        st.session_state['trained_complexity'] = complexity_key
+        st.session_state['trained_complexity'] = complexity_arg # Sauvegarde le choix dynamique
         st.session_state['trained_X_train_len'] = len(X_train) 
 
     is_model_stale = not ('model' in st.session_state and
                            st.session_state.get('trained_symbol') == symbol and
                            st.session_state.get('trained_horizon') == horizon_key and
-                           st.session_state.get('trained_complexity') == complexity_key)
+                           st.session_state.get('trained_complexity') == complexity_arg) # Vérifie le choix dynamique
 
     if not is_model_stale:
         model = st.session_state['model']
@@ -567,7 +588,7 @@ if selected_page_key == 'home':
         price_scaler = st.session_state['price_scaler']
         feature_scalers = st.session_state['feature_scalers']
         df_history_original = st.session_state['df_original']
-        df_history_processed = st.session_state['df_processed'] # Récupérer le df traité
+        df_history_processed = st.session_state['df_processed']
         features_used = st.session_state['features_used']
         target_col = st.session_state['target_col']
         
@@ -591,7 +612,7 @@ if selected_page_key == 'home':
                     st.write(f"**{t('hp_title')}**")
                     hp_md = f"- **{t('hp_units')}:** `{best_hp_data.get('units_1')}`\n"
                     hp_md += f"- **{t('hp_dropout')}:** `{best_hp_data.get('dropout_1'):.2f}`\n"
-                    if complexity_key == 'complex':
+                    if complexity_arg == 'Complexe': # S'assurer d'utiliser la variable dynamique
                         hp_md += f"- **{t('hp_units_2')}:** `{best_hp_data.get('units_2')}`\n"
                         hp_md += f"- **{t('hp_dropout_2')}:** `{best_hp_data.get('dropout_2'):.2f}`\n"
                     hp_md += f"- **{t('hp_lr')}:** `{best_hp_data.get('learning_rate'):.6f}`"
@@ -621,22 +642,18 @@ if selected_page_key == 'home':
 
         with tab_eval:
             st.subheader(t('eval_title'))
-            
             prep_results_eval = prepare_data(df_history_original, features_used)
             if prep_results_eval[0] is None:
                 st.error(t('eval_error'))
             else:
                 _, _, X_test_eval, y_test_eval, price_scaler_eval, _, df_processed_eval = prep_results_eval
-                
                 if len(X_test_eval) == 0:
                     st.warning("Pas assez de données pour un jeu de test. Essayez un horizon de données plus long.")
                 else:
                     preds_scaled = model.predict(X_test_eval)
                     preds_rescaled = price_scaler_eval.inverse_transform(preds_scaled)
                     y_test_rescaled = price_scaler_eval.inverse_transform(y_test_eval.reshape(-1, 1))
-                    
                     test_dates = df_processed_eval.index[X_train_len + LOOK_BACK:]
-
                     if len(test_dates) == len(y_test_rescaled):
                         with st.container(border=True):
                             rmse = np.sqrt(mean_squared_error(y_test_rescaled, preds_rescaled))
@@ -659,58 +676,42 @@ if selected_page_key == 'home':
         with tab_proj:
             st.subheader(f"{t('proj_title')} ({selected_horizon_display})")
             with st.spinner(t('proj_spinner')):
-                
-                # 1. Recréer tous les scalers sur l'ensemble des données
                 price_scaler_full = MinMaxScaler(feature_range=(0, 1))
                 price_scaler_full.fit(df_history_original[[target_col]])
-                
                 feature_scalers_full = {}
                 df_scaled_full = pd.DataFrame(index=df_history_original.index)
                 df_scaled_full[target_col] = price_scaler_full.transform(df_history_original[[target_col]])
-                
                 for feature in features_used[1:]:
                     scaler = MinMaxScaler(feature_range=(0, 1))
                     df_scaled_full[feature] = scaler.fit_transform(df_history_original[[feature]])
                     feature_scalers_full[feature] = scaler
-                
-                # 2. Obtenir la dernière séquence
                 last_60_days_scaled = df_scaled_full.values[-LOOK_BACK:]
                 current_batch = last_60_days_scaled.reshape(1, LOOK_BACK, len(features_used))
-                
                 future_preds_scaled = []
-                
                 for _ in range(future_days):
                     pred_scaled = model.predict(current_batch, verbose=0)[0]
                     future_preds_scaled.append(pred_scaled)
-                    
                     new_entry_scaled = np.zeros((1, 1, len(features_used)))
                     new_entry_scaled[0, 0, 0] = pred_scaled[0]
-                    
                     if len(features_used) > 1:
                         for i, feature in enumerate(features_used[1:]):
                             mean_feature_val = current_batch[0, :, i+1].mean()
                             new_entry_scaled[0, 0, i+1] = mean_feature_val
-                            
                     current_batch = np.append(current_batch[:, 1:, :], new_entry_scaled, axis=1)
-            
             future_preds_rescaled = price_scaler_full.inverse_transform(np.array(future_preds_scaled).reshape(-1, 1))
-            
             future_dates = pd.date_range(start=df_history_original.index[-1] + pd.Timedelta(days=1), periods=future_days, freq='B')
             df_future = pd.DataFrame(future_preds_rescaled, index=future_dates, columns=['Prévision'])
-            
             with st.container(border=True):
                 fig_future = go.Figure()
                 fig_future.add_trace(go.Scatter(x=df_history_original.index, y=df_history_original[target_col], mode='lines', name=t('proj_hist'), line=dict(color='#0A2342')))
                 fig_future.add_trace(go.Scatter(x=df_future.index, y=df_future['Prévision'], mode='lines', name=t('proj_future'), line=dict(color='#FF6B00', dash='dash')))
                 fig_future.update_layout(title_text=t('proj_chart_title'), hovermode="x unified")
                 st.plotly_chart(fig_future, use_container_width=True)
-
             st.subheader(t('proj_analysis_title'))
             with st.container(border=True):
-                last_price = df_history_original[target_col].iloc[-1] # Prix de départ
+                last_price = df_history_original[target_col].iloc[-1]
                 comment_text = generate_prediction_commentary(last_price, df_future, symbol_name_display, t)
                 st.markdown(comment_text, unsafe_allow_html=True if st.session_state.lang == 'ar' else False)
-
             csv = df_future.to_csv().encode('utf-8')
             st.download_button(t('proj_download'), csv, f"forecast_{symbol}.csv", "text/csv")
 
